@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Распознавание анализа крови</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="overlay">
+    <div class="card">
+        <h1>Распознавание биохимического анализа крови</h1>
+
+        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.pdf">
+
+        <button id="uploadBtn">Загрузить анализ</button>
+
+        <button id="loadingBtn" disabled style="display:none;">
+            Обрабатывается...
+        </button>
+
+        <h2>Результат</h2>
+        <textarea id="result" placeholder="Здесь появится результат..." readonly></textarea>
+    </div>
+</div>
+
+<script>
+const uploadBtn = document.getElementById("uploadBtn");
+const loadingBtn = document.getElementById("loadingBtn");
+const resultField = document.getElementById("result");
+const fileInput = document.getElementById("fileInput");
+
+uploadBtn.onclick = async () => {
+    if (!fileInput.files.length) {
+        alert("Пожалуйста, выберите файл");
+        return;
+    }
+
+    uploadBtn.style.display = "none";
+    loadingBtn.style.display = "block";
+    resultField.value = "";
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    try {
+        const response = await fetch("/recognize", {
+            method: "POST",
+            body: formData
+        });
+
+        const text = await response.text();
+        resultField.value = text;
+
+    } catch (err) {
+        resultField.value = "Ошибка при обработке файла";
+    }
+
+    loadingBtn.style.display = "none";
+    uploadBtn.style.display = "block";
+};
+</script>
+
+</body>
+</html>
